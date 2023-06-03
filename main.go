@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"net/http"
+	"time"
 )
 
 //go:embed *.html
@@ -17,7 +18,9 @@ func run() error {
 	r.SetHTMLTemplate(templ)
 
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", nil)
+		c.HTML(http.StatusOK, "index.html", map[string]any{
+			"date": time.Now().String(),
+		})
 		//c.String(200, "no")
 	})
 
