@@ -20,8 +20,8 @@ func run() error {
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", map[string]any{
 			"date": time.Now().String(),
+			"id":   "abc123",
 		})
-		//c.String(200, "no")
 	})
 
 	err := r.Run("127.0.0.1:8000")
