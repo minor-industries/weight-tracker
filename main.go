@@ -3,9 +3,11 @@ package main
 import (
 	"embed"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"html/template"
 	"net/http"
 	"time"
+	"weight/db"
 )
 
 //go:embed *.html
@@ -13,6 +15,11 @@ var f embed.FS
 
 func run() error {
 	r := gin.Default()
+
+	_, err := db.Get()
+	if err != nil {
+		return errors.Wrap(err, "get db")
+	}
 
 	templ := template.Must(template.New("").ParseFS(f, "*.html"))
 	r.SetHTMLTemplate(templ)
@@ -29,15 +36,16 @@ func run() error {
 		weight, _ := c.GetPostForm("weight")
 		unit, _ := c.GetPostForm("unit")
 
+		// TODO: validate form values
+
 		c.HTML(http.StatusInternalServerError, "form-handler.html", map[string]any{
 			"weight": weight,
 			"unit":   unit,
 		})
 	})
 
-	err := r.Run("127.0.0.1:8000")
-	if err != nil {
-
+	if err := r.Run("127.0.0.1:8000"); err != nil {
+		return errors.Wrap(err, "run")
 	}
 
 	return nil
