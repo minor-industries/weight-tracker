@@ -97,7 +97,7 @@ func writeWeightToDB(c *gin.Context, conn *sqlx.DB) error {
 		return errors.Wrap(err, "insert")
 	}
 
-	c.HTML(http.StatusInternalServerError, "form-handler.html", map[string]any{
+	c.HTML(http.StatusOK, "form-handler.html", map[string]any{
 		"weight": weight,
 		"unit":   unitParam,
 		"t":      now,
