@@ -19,16 +19,19 @@ func run() error {
 
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", map[string]any{
-			"date": time.Now().String(),
-			"id":   "abc123",
+			"date":   time.Now().String(),
+			"id":     "abc123",
+			"action": "form-handler",
 		})
 	})
 
-	r.POST("/weight-form", func(c *gin.Context) {
-		w, _ := c.GetPostForm("w")
+	r.POST("/form-handler", func(c *gin.Context) {
+		weight, _ := c.GetPostForm("weight")
+		unit, _ := c.GetPostForm("unit")
 
-		c.HTML(http.StatusInternalServerError, "form-submit.html", map[string]any{
-			"w": w,
+		c.HTML(http.StatusInternalServerError, "form-handler.html", map[string]any{
+			"weight": weight,
+			"unit":   unit,
 		})
 	})
 

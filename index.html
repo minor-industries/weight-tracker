@@ -5,16 +5,26 @@
     <title>Title</title>
 </head>
 <body>
-{{.date}}
+<form action="{{.action}}" method="post">
+    <div>
+        <input type="hidden" name="id" value="{{.id}}"/>
+        <label>
+            weight
+            <input name="weight"/>
+        </label>
+    </div>
 
-<form action="/weight-form" method="post">
-    <input type="hidden" name="id" value="{{.id}}"/>
-    <label>
-        w
-        <input name="w"/>
-    </label>
+    <div>
+        <input type="radio" id="kg" name="unit" value="kg" checked="checked">
+        <label for="kg">kg</label><br>
+
+        <input type="radio" id="lbs" name="unit" value="lbs">
+        <label for="lbs">lbs</label><br>
+    </div>
 </form>
 
+<hr>
+{{.date}}
 
 </body>
 </html>
