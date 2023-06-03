@@ -69,13 +69,29 @@ func writeWeightToDB(c *gin.Context, conn *sqlx.DB) error {
 	}
 
 	// TODO: validate form values
+	now := time.Now()
+	zone, _ := now.Zone()
+
 	_, err = conn.NamedExec(
-		`insert into weight(id, t, weight, unit) values(uuid_to_bin(:id), :t, :weight, :unit)`,
+		`insert into weight(
+		   	id,
+		   	t,
+		   	timezone,
+		   	weight, 
+			unit
+		) values (
+			uuid_to_bin(:id), 
+			:t, 
+			:timezone, 
+			:weight, 
+			:unit
+		)`,
 		&db.Weight{
-			Id:     idParam,
-			T:      time.Now().UTC(),
-			Weight: weight,
-			Unit:   unitParam,
+			Id:       idParam,
+			T:        now.UTC(),
+			Timezone: zone,
+			Weight:   weight,
+			Unit:     unitParam,
 		})
 	if err != nil {
 		return errors.Wrap(err, "insert")

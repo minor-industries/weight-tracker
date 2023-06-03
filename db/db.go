@@ -8,10 +8,11 @@ import (
 )
 
 type Weight struct {
-	Id     string    `db:"id"`
-	T      time.Time `db:"t"`
-	Weight float64   `db:"weight"`
-	Unit   string    `db:"unit"`
+	Id       string    `db:"id"`
+	T        time.Time `db:"t"`
+	Timezone string    `db:"timezone"`
+	Weight   float64   `db:"weight"`
+	Unit     string    `db:"unit"`
 }
 
 func Get() (*sqlx.DB, error) {
@@ -26,6 +27,7 @@ func Get() (*sqlx.DB, error) {
 		weight(
 			id binary(16),
 		    t datetime,
+		    timezone varchar(255),
 			weight double,
 			unit varchar(32),
 		    PRIMARY KEY(id)
