@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"html/template"
@@ -29,8 +30,8 @@ func run() error {
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", map[string]any{
 			"date":   time.Now().String(),
-			"id":     "abc123",
 			"action": "form-handler",
+			"id":     uuid.New().String(),
 		})
 	})
 
@@ -53,6 +54,7 @@ func run() error {
 func writeWeightToDB(c *gin.Context, conn *sqlx.DB) error {
 	weightParam := c.PostForm("weight")
 	unitParam := c.PostForm("unit")
+	idParam := c.PostForm("id")
 
 	switch unitParam {
 	case "kg", "lbs":
@@ -68,10 +70,10 @@ func writeWeightToDB(c *gin.Context, conn *sqlx.DB) error {
 
 	// TODO: validate form values
 	_, err = conn.NamedExec(
-		`insert into weight(id, t, weight, unit) values(:id, :t, :weight, :unit)`,
+		`insert into weight(id, t, weight, unit) values(uuid_to_bin(:id), :t, :weight, :unit)`,
 		&db.Weight{
-			Id:     []byte{},
-			T:      time.Now(),
+			Id:     idParam,
+			T:      time.Now().UTC(),
 			Weight: weight,
 			Unit:   unitParam,
 		})
@@ -80,9 +82,8 @@ func writeWeightToDB(c *gin.Context, conn *sqlx.DB) error {
 	}
 
 	c.HTML(http.StatusInternalServerError, "form-handler.html", map[string]any{
-		"weight":  weight,
-		"unit":    unitParam,
-		"message": err.Error(),
+		"weight": weight,
+		"unit":   unitParam,
 	})
 
 	return nil
