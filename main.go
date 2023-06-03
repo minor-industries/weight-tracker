@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"html/template"
 	"net/http"
+	"strconv"
 	"time"
 	"weight/db"
 )
@@ -16,7 +17,7 @@ var f embed.FS
 func run() error {
 	r := gin.Default()
 
-	_, err := db.Get()
+	conn, err := db.Get()
 	if err != nil {
 		return errors.Wrap(err, "get db")
 	}
@@ -33,14 +34,23 @@ func run() error {
 	})
 
 	r.POST("/form-handler", func(c *gin.Context) {
-		weight, _ := c.GetPostForm("weight")
-		unit, _ := c.GetPostForm("unit")
+		weightParam, _ := c.GetPostForm("weight")
+		unitParam, _ := c.GetPostForm("unit")
+
+		weight, _ := strconv.ParseFloat(weightParam, 64)
 
 		// TODO: validate form values
+		_, err := conn.NamedExec(`insert into weight(id, t, weight, unit) values(:id, :t, :weight, :unit)`, &db.Weight{
+			Id:     []byte{},
+			T:      time.Now(),
+			Weight: weight,
+			Unit:   unitParam,
+		})
 
 		c.HTML(http.StatusInternalServerError, "form-handler.html", map[string]any{
-			"weight": weight,
-			"unit":   unit,
+			"weight":  weight,
+			"unit":    unitParam,
+			"message": err.Error(),
 		})
 	})
 

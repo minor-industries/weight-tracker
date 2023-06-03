@@ -4,7 +4,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	"time"
 )
+
+type Weight struct {
+	Id     []byte    `db:"id"`
+	T      time.Time `db:"t"`
+	Weight float64   `db:"weight"`
+	Unit   string    `db:"unit"`
+}
 
 func Get() (*sqlx.DB, error) {
 	conn, err := sqlx.Connect("mysql", "root:@/weight?parseTime=true")
