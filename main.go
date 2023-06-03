@@ -24,6 +24,14 @@ func run() error {
 		})
 	})
 
+	r.POST("/weight-form", func(c *gin.Context) {
+		w, _ := c.GetPostForm("w")
+
+		c.HTML(http.StatusInternalServerError, "form-submit.html", map[string]any{
+			"w": w,
+		})
+	})
+
 	err := r.Run("127.0.0.1:8000")
 	if err != nil {
 
