@@ -8,7 +8,7 @@ import (
 )
 
 type Weight struct {
-	Id       string    `db:"id"`
+	Id       []byte    `db:"id"`
 	T        time.Time `db:"t"`
 	Timezone string    `db:"timezone"`
 	Weight   float64   `db:"weight"`
