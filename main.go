@@ -53,7 +53,7 @@ func run() error {
 		c.HTML(http.StatusOK, "form-handler.html", res)
 	})
 
-	if err := r.Run("127.0.0.1:8000"); err != nil {
+	if err := r.Run("0.0.0.0:8000"); err != nil {
 		return errors.Wrap(err, "run")
 	}
 
