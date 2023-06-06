@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"weight/db"
+	"weight-tracker/db"
 )
 
 //go:embed *.html

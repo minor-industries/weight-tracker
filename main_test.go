@@ -4,11 +4,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
-	"weight/db"
+	"weight-tracker/db"
 )
 
 func Test_writeWeightToDB(t *testing.T) {
-	conn, err := db.Get()
+	conn, err := db.Get("localhost")
 	require.NoError(t, err)
 
 	id, err := uuid.NewUUID()

@@ -1,4 +1,4 @@
-module weight
+module weight-tracker
 
 go 1.20
 
