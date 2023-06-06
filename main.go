@@ -20,7 +20,7 @@ var f embed.FS
 func run() error {
 	r := gin.Default()
 
-	conn, err := db.Get()
+	conn, err := db.Get("git01.vpn")
 	if err != nil {
 		return errors.Wrap(err, "get db")
 	}
