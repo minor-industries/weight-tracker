@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"time"
 	"weight-tracker/db"
+	"weight-tracker/graphs"
 )
 
 //go:embed *.html
@@ -34,6 +35,14 @@ func run() error {
 			"action": "form-handler",
 			"id":     uuid.New().String(),
 		})
+	})
+
+	r.GET("/weight.svg", func(c *gin.Context) {
+		svg, err := graphs.Graph()
+		if err != nil {
+			panic(err)
+		}
+		c.Data(200, "image/svg+xml", svg)
 	})
 
 	r.POST("/form-handler", func(c *gin.Context) {

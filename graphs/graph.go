@@ -1,6 +1,7 @@
 package graphs
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
 	"github.com/go-gorp/gorp/v3"
@@ -21,17 +22,17 @@ type Weight struct {
 	Unit     string    `db:"unit,size:32"`
 }
 
-func Graph() error {
+func Graph() ([]byte, error) {
 	const host = "127.0.0.1"
 	url := fmt.Sprintf("root:@tcp(%s)/weight?parseTime=true", host)
 
 	db, err := sql.Open("mysql", url)
 	if err != nil {
-		return errors.Wrap(err, "open db")
+		return nil, errors.Wrap(err, "open db")
 	}
 
 	if err := db.Ping(); err != nil {
-		return errors.Wrap(err, "ping")
+		return nil, errors.Wrap(err, "ping")
 	}
 
 	// construct a gorp DbMap
@@ -40,26 +41,27 @@ func Graph() error {
 
 	var data []Weight
 	if _, err := dbmap.Select(&data, "select * from weight order by t"); err != nil {
-		return errors.Wrap(err, "select")
+		return nil, errors.Wrap(err, "select")
 	}
 
 	for _, w := range data {
 		fmt.Println(w)
 	}
 
-	if _, err := plotData(data); err != nil {
-		return errors.Wrap(err, "plot data")
+	svg, err := plotData(data)
+	if err != nil {
+		return nil, errors.Wrap(err, "plot data")
 	}
 
-	return nil
+	return svg, nil
 }
 
 func plotData(data []Weight) ([]byte, error) {
 	p := plot.New()
 
-	p.Title.Text = "Temp" // TODO: allow change
+	p.Title.Text = "Weight" // TODO: allow change
 	p.X.Label.Text = "t"
-	p.Y.Label.Text = "Temp"
+	p.Y.Label.Text = "Weight"
 
 	var pts plotter.XYs
 
@@ -81,18 +83,12 @@ func plotData(data []Weight) ([]byte, error) {
 		return nil, errors.Wrap(err, "add line points")
 	}
 
-	if err := p.Save(8*vg.Inch, 4*vg.Inch, "weight.svg"); err != nil {
-		return nil, errors.Wrap(err, "save")
+	w, err := p.WriterTo(8*vg.Inch, 4*vg.Inch, "svg")
+	buf := bytes.NewBuffer(nil)
+	_, err = w.WriteTo(buf)
+	if err != nil {
+		return nil, errors.Wrap(err, "write to")
 	}
 
-	return nil, nil
-
-	////w, err := p.WriterTo(8*vg.Inch, 4*vg.Inch, "svg")
-	////buf := bytes.NewBuffer(nil)
-	////_, err = w.WriteTo(buf)
-	////if err != nil {
-	////	return nil, errors.Wrap(err, "write to")
-	////}
-	//
-	//return buf.Bytes(), nil
+	return buf.Bytes(), nil
 }
