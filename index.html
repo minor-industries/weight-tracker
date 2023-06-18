@@ -6,8 +6,6 @@
 </head>
 <body>
 <form action="{{.action}}" method="post">
-    <img src="weight.svg"/>
-
     <div>
         <input type="hidden" name="id" value="{{.id}}"/>
         <label>
@@ -24,6 +22,16 @@
         <label for="lbs">lbs</label><br>
     </div>
 </form>
+
+<div>
+    <img src="weight.svg"/>
+</div>
+
+<div>
+    (<a href="weight.svg?months=9999">view all</a>)
+</div>
+
+
 
 <hr>
 {{.date}}

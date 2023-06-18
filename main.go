@@ -43,7 +43,16 @@ func run() error {
 	})
 
 	r.GET("/weight.svg", func(c *gin.Context) {
-		svg, err := graphs.Graph(dbmap)
+		months := 3
+		if m, ok := c.GetQuery("months"); ok {
+			mInt, err := strconv.ParseInt(m, 10, 64)
+			switch err {
+			case nil:
+				months = int(mInt)
+			}
+		}
+
+		svg, err := graphs.Graph(dbmap, months)
 		if err != nil {
 			panic(err)
 		}

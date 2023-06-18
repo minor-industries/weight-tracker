@@ -13,9 +13,24 @@ import (
 	"weight-tracker/db"
 )
 
-func Graph(dbmap *gorp.DbMap) ([]byte, error) {
+var query = `
+SELECT
+	*
+FROM
+	weight
+WHERE
+	t >= DATE_SUB(CURDATE(), INTERVAL :months MONTH)
+ORDER BY
+	t ASC
+`
+
+func Graph(dbmap *gorp.DbMap, months int) ([]byte, error) {
 	var data []db.Weight
-	if _, err := dbmap.Select(&data, "select * from weight order by t"); err != nil {
+	if _, err := dbmap.Select(
+		&data,
+		query,
+		map[string]any{"months": months},
+	); err != nil {
 		return nil, errors.Wrap(err, "select")
 	}
 
