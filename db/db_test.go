@@ -33,5 +33,17 @@ func TestTime(t *testing.T) {
 }
 
 func TestRows(t *testing.T) {
+	dbmap, err := Get("127.0.0.1")
+	require.NoError(t, err)
 
+	loc, err := time.LoadLocation("America/Los_Angeles")
+	require.NoError(t, err)
+
+	var data []Weight
+	_, err = dbmap.Select(&data, "select * from weight order by t")
+	require.NoError(t, err)
+
+	for _, row := range data {
+		fmt.Println(row.T.In(loc))
+	}
 }
