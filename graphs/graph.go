@@ -17,7 +17,7 @@ import (
 type Weight struct {
 	Id       []byte    `db:"id"`
 	T        time.Time `db:"t"`
-	Timezone string    `db:"timezone,size:255"`
+	Location string    `db:"location,size:255"`
 	Weight   float64   `db:"weight"`
 	Unit     string    `db:"unit,size:32"`
 }
