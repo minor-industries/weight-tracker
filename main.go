@@ -4,8 +4,8 @@ import (
 	"embed"
 	"github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
+	"github.com/go-gorp/gorp/v3"
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"html/template"
 	"net/http"
@@ -15,13 +15,18 @@ import (
 	"weight-tracker/graphs"
 )
 
+const (
+	dbHost   = "127.0.0.1"
+	location = "America/Los_Angeles"
+)
+
 //go:embed *.html
 var f embed.FS
 
 func run() error {
 	r := gin.Default()
 
-	conn, err := db.Get("127.0.0.1")
+	dbmap, err := db.Get(dbHost)
 	if err != nil {
 		return errors.Wrap(err, "get db")
 	}
@@ -38,7 +43,7 @@ func run() error {
 	})
 
 	r.GET("/weight.svg", func(c *gin.Context) {
-		svg, err := graphs.Graph()
+		svg, err := graphs.Graph(dbmap)
 		if err != nil {
 			panic(err)
 		}
@@ -47,7 +52,7 @@ func run() error {
 
 	r.POST("/form-handler", func(c *gin.Context) {
 		res, err := writeWeightToDB(
-			conn,
+			dbmap,
 			c.PostForm("weight"),
 			c.PostForm("unit"),
 			c.PostForm("id"),
@@ -80,7 +85,7 @@ func Exprs(first string, rest ...string) []any {
 }
 
 func writeWeightToDB(
-	conn *sqlx.DB,
+	dbmap *gorp.DbMap,
 	weightParam string,
 	unitParam string,
 	idParam string,
@@ -98,40 +103,28 @@ func writeWeightToDB(
 	}
 
 	now := time.Now()
-	zone, _ := now.Zone()
 
-	sql, _, err := squirrel.Insert("weight").Columns(
-		"id",
-		"t",
-		"timezone",
-		"weight",
-		"unit",
-	).Values(Exprs(
-		"uuid_to_bin(:id)",
-		":t",
-		":timezone",
-		":weight",
-		":unit",
-	)...).ToSql()
+	id, err := uuid.Parse(idParam)
 	if err != nil {
-		return nil, errors.Wrap(err, "to sql")
+		return nil, errors.Wrap(err, "parse id")
 	}
 
-	query, args, err := sqlx.Named(sql, &db.Weight{
-		Id:       []byte(idParam),
+	idBytes, err := id.MarshalBinary()
+	if err != nil {
+		return nil, errors.Wrap(err, "marshal id")
+	}
+
+	w := &db.Weight{
+		Id:       idBytes,
 		T:        now.UTC(),
-		Timezone: zone,
+		Location: location,
 		Weight:   weight,
 		Unit:     unitParam,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "named")
 	}
 
-	query = conn.Rebind(query)
-
-	if _, err := conn.Exec(query, args...); err != nil {
-		return nil, errors.Wrap(err, "exec")
+	err = dbmap.Insert(w)
+	if err != nil {
+		return nil, errors.Wrap(err, "insert")
 	}
 
 	return map[string]any{

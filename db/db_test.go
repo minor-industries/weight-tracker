@@ -31,3 +31,7 @@ func TestTime(t *testing.T) {
 	fmt.Println(t0)
 	fmt.Println(t0.In(time.UTC).Truncate(24 * time.Hour))
 }
+
+func TestRows(t *testing.T) {
+
+}

@@ -2,7 +2,6 @@ package graphs
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"github.com/go-gorp/gorp/v3"
 	_ "github.com/go-sql-driver/mysql"
@@ -11,35 +10,11 @@ import (
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
-	"time"
+	"weight-tracker/db"
 )
 
-type Weight struct {
-	Id       []byte    `db:"id"`
-	T        time.Time `db:"t"`
-	Location string    `db:"location,size:255"`
-	Weight   float64   `db:"weight"`
-	Unit     string    `db:"unit,size:32"`
-}
-
-func Graph() ([]byte, error) {
-	const host = "127.0.0.1"
-	url := fmt.Sprintf("root:@tcp(%s)/weight?parseTime=true", host)
-
-	db, err := sql.Open("mysql", url)
-	if err != nil {
-		return nil, errors.Wrap(err, "open db")
-	}
-
-	if err := db.Ping(); err != nil {
-		return nil, errors.Wrap(err, "ping")
-	}
-
-	// construct a gorp DbMap
-	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{}}
-	fmt.Println(dbmap)
-
-	var data []Weight
+func Graph(dbmap *gorp.DbMap) ([]byte, error) {
+	var data []db.Weight
 	if _, err := dbmap.Select(&data, "select * from weight order by t"); err != nil {
 		return nil, errors.Wrap(err, "select")
 	}
@@ -56,7 +31,7 @@ func Graph() ([]byte, error) {
 	return svg, nil
 }
 
-func plotData(data []Weight) ([]byte, error) {
+func plotData(data []db.Weight) ([]byte, error) {
 	p := plot.New()
 
 	p.Title.Text = "Weight" // TODO: allow change
