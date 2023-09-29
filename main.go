@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"html/template"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 	"weight-tracker/db"
@@ -35,24 +36,36 @@ func run() error {
 	r.SetHTMLTemplate(templ)
 
 	r.GET("/", func(c *gin.Context) {
+		months := getMonthsParam(c, 3)
+
+		data, err := getData(dbmap, months)
+		if err != nil {
+			_ = c.Error(err)
+			return
+		}
+
+		sort.Slice(data, func(i, j int) bool {
+			return data[i].T.After(data[j].T)
+		})
+
 		c.HTML(http.StatusOK, "index.html", map[string]any{
 			"date":   time.Now().String(),
 			"action": "form-handler",
 			"id":     uuid.New().String(),
+			"data":   data,
 		})
 	})
 
 	r.GET("/weight.svg", func(c *gin.Context) {
-		months := 3
-		if m, ok := c.GetQuery("months"); ok {
-			mInt, err := strconv.ParseInt(m, 10, 64)
-			switch err {
-			case nil:
-				months = int(mInt)
-			}
+		months := getMonthsParam(c, 3)
+
+		data, err := getData(dbmap, months)
+		if err != nil {
+			_ = c.Error(err)
+			return
 		}
 
-		svg, err := graphs.Graph(dbmap, months)
+		svg, err := graphs.Graph(data)
 		if err != nil {
 			panic(err)
 		}
@@ -81,6 +94,18 @@ func run() error {
 	}
 
 	return nil
+}
+
+func getMonthsParam(c *gin.Context, dflt int) int {
+	months := dflt
+	if m, ok := c.GetQuery("months"); ok {
+		mInt, err := strconv.ParseInt(m, 10, 64)
+		switch err {
+		case nil:
+			months = int(mInt)
+		}
+	}
+	return months
 }
 
 func Exprs(first string, rest ...string) []any {

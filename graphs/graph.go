@@ -2,8 +2,6 @@ package graphs
 
 import (
 	"bytes"
-	"fmt"
-	"github.com/go-gorp/gorp/v3"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
 	"gonum.org/v1/plot"
@@ -13,31 +11,7 @@ import (
 	"weight-tracker/db"
 )
 
-var query = `
-SELECT
-	*
-FROM
-	weight
-WHERE
-	t >= DATE_SUB(CURDATE(), INTERVAL :months MONTH)
-ORDER BY
-	t ASC
-`
-
-func Graph(dbmap *gorp.DbMap, months int) ([]byte, error) {
-	var data []db.Weight
-	if _, err := dbmap.Select(
-		&data,
-		query,
-		map[string]any{"months": months},
-	); err != nil {
-		return nil, errors.Wrap(err, "select")
-	}
-
-	for _, w := range data {
-		fmt.Println(w)
-	}
-
+func Graph(data []db.Weight) ([]byte, error) {
 	svg, err := plotData(data)
 	if err != nil {
 		return nil, errors.Wrap(err, "plot data")
