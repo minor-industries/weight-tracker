@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
 	"github.com/go-gorp/gorp/v3"
@@ -32,7 +33,37 @@ func run() error {
 		return errors.Wrap(err, "get db")
 	}
 
-	templ := template.Must(template.New("").ParseFS(f, "*.html"))
+	funcs := map[string]any{
+		"Localtime": func(w db.Weight) string {
+			loc, err := time.LoadLocation(w.Location)
+			if err != nil {
+				return "~location error~"
+			}
+			return w.T.In(loc).Format("2006-01-02 15:04:05")
+		},
+		"FmtWeight": func(w float64) string {
+			return fmt.Sprintf("%.02f", w)
+		},
+		"Delta": func(w []db.Weight, i0 int) string {
+			i1 := i0 + 1
+			if i1 >= len(w) {
+				return "-"
+			}
+
+			delta := w[i0].Weight - w[i1].Weight
+
+			return fmt.Sprintf("%+0.02f", delta)
+		},
+		"DateOfWeek": func(w db.Weight) string {
+			loc, err := time.LoadLocation(w.Location)
+			if err != nil {
+				return "~location error~"
+			}
+			return w.T.In(loc).Format("Mon")
+		},
+	}
+
+	templ := template.Must(template.New("").Funcs(funcs).ParseFS(f, "*.html"))
 	r.SetHTMLTemplate(templ)
 
 	r.GET("/", func(c *gin.Context) {

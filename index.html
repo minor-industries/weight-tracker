@@ -48,11 +48,20 @@
 </div>
 
 <table>
-    {{range .data}}
     <tr>
-        <td>{{.T}}</td>
-        <td>{{.Weight}}</td>
-        <td>{{.Location}}</td>
+        <th>Time</th>
+        <th>Day</th>
+        <th>Weight</th>
+        <th>Delta</th>
+
+    </tr>
+    {{$data := .data}}
+    {{range $i, $d := .data}}
+    <tr>
+        <td>{{Localtime $d}}</td>
+        <td>{{DateOfWeek $d}}</td>
+        <td>{{FmtWeight $d.Weight}}</td>
+        <td>{{Delta $data $i}}</td>
     </tr>
     {{end}}
 </table>
