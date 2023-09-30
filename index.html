@@ -18,6 +18,11 @@
         th {
             background-color: #f2f2f2;
         }
+
+        .center {
+            text-align: center;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -63,6 +68,12 @@
         <td>{{FmtWeight $d.Weight}}</td>
         <td>{{Delta $data $i}}</td>
     </tr>
+    {{$missing := DaysMissing $data $i}}
+    {{if $missing}}
+    <tr>
+        <td class="center" colspan="4">{{$missing}}</td>
+    </tr>
+    {{end}}
     {{end}}
 </table>
 

@@ -61,6 +61,41 @@ func run() error {
 			}
 			return w.T.In(loc).Format("Mon")
 		},
+
+		"DaysMissing": func(w []db.Weight, i0 int) string {
+			i1 := i0 + 1
+			if i1 >= len(w) {
+				return ""
+			}
+
+			loc0, err := time.LoadLocation(w[i0].Location)
+			if err != nil {
+				return "~location error~"
+			}
+
+			loc1, err := time.LoadLocation(w[i1].Location)
+			if err != nil {
+				return "~location error~"
+			}
+
+			t0 := w[i0].T.In(loc0)
+			t1 := w[i1].T.In(loc1)
+
+			day0 := time.Date(t0.Year(), t0.Month(), t0.Day(), 0, 0, 0, 0, time.UTC)
+			day1 := time.Date(t1.Year(), t1.Month(), t1.Day(), 0, 0, 0, 0, time.UTC)
+
+			delta := day0.Sub(day1)
+			days := int(delta.Hours() / 24)
+
+			switch days {
+			case 0, 1:
+				return ""
+			case 2:
+				return "1 day missing"
+			default:
+				return fmt.Sprintf("%d days missing", days)
+			}
+		},
 	}
 
 	templ := template.Must(template.New("").Funcs(funcs).ParseFS(f, "*.html"))
