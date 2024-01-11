@@ -12,7 +12,7 @@ func CommitAndPush(dbmap *gorp.DbMap) error {
 		return errors.Wrap(err, "add")
 	}
 
-	_, err = dbmap.SelectInt(`call dolt_commit('-m', 'data updates')`)
+	_, err = dbmap.SelectStr(`call dolt_commit('-m', 'data updates')`)
 	if err != nil {
 		var mysqlErr *mysql.MySQLError
 		ok := errors.As(err, &mysqlErr)

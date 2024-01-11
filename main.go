@@ -155,10 +155,12 @@ func run() error {
 		c.HTML(http.StatusOK, "form-handler.html", res)
 	})
 
-	r.GET("/commit-and-push", func(c *gin.Context) {
+	r.GET("/commit-and-push.html", func(c *gin.Context) {
 		err := db.CommitAndPush(dbmap)
 
-		c.String(200, "error: %v", err)
+		c.HTML(200, "commit-and-push.html", map[string]any{
+			"err": err,
+		})
 	})
 
 	if err := r.Run("0.0.0.0:8000"); err != nil {
