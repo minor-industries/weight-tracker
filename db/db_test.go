@@ -52,6 +52,6 @@ func TestCommit(t *testing.T) {
 	dbmap, err := Get("127.0.0.1")
 	require.NoError(t, err)
 
-	err = CommitAndPush(dbmap)
+	_, err = CommitAndPush(dbmap)
 	require.NoError(t, err)
 }
