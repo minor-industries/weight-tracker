@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"html/template"
+	"io/fs"
 	"net/http"
 	"sort"
 	"strconv"
@@ -166,11 +167,33 @@ func run() error {
 		c.HTML(200, "commit-and-push.html", args)
 	})
 
+	files(r,
+		"dygraph.min.js", "application/javascript",
+		"dygraph.css", "text/css",
+	)
+
 	if err := r.Run("0.0.0.0:8000"); err != nil {
 		return errors.Wrap(err, "run")
 	}
 
 	return nil
+}
+
+func files(r *gin.Engine, files ...string) {
+	for i := 0; i < len(files); i += 2 {
+		name := files[i]
+		ct := files[i+1]
+		r.GET("/"+name, func(c *gin.Context) {
+			header := c.Writer.Header()
+			header["Content-Type"] = []string{ct}
+			content, err := fs.ReadFile(assets.FS, name)
+			if err != nil {
+				c.Status(404)
+				return
+			}
+			_, _ = c.Writer.Write(content)
+		})
+	}
 }
 
 func getMonthsParam(c *gin.Context, dflt int) int {
