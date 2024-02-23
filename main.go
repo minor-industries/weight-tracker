@@ -1,7 +1,6 @@
 package main
 
 import (
-	"embed"
 	"fmt"
 	"github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
@@ -13,6 +12,7 @@ import (
 	"sort"
 	"strconv"
 	"time"
+	"weight-tracker/assets"
 	"weight-tracker/db"
 	"weight-tracker/graphs"
 )
@@ -21,9 +21,6 @@ const (
 	dbHost   = "127.0.0.1"
 	location = "America/Los_Angeles"
 )
-
-//go:embed *.html
-var f embed.FS
 
 func run() error {
 	r := gin.Default()
@@ -98,7 +95,7 @@ func run() error {
 		},
 	}
 
-	templ := template.Must(template.New("").Funcs(funcs).ParseFS(f, "*.html"))
+	templ := template.Must(template.New("").Funcs(funcs).ParseFS(assets.FS, "*.html"))
 	r.SetHTMLTemplate(templ)
 
 	r.GET("/", func(c *gin.Context) {
