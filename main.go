@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 	"weight-tracker/assets"
 	"weight-tracker/db"
@@ -165,6 +166,30 @@ func run() error {
 		}
 
 		c.HTML(200, "commit-and-push.html", args)
+	})
+
+	r.GET("/data.csv", func(c *gin.Context) {
+		c.Writer.Header().Set("Content-Type", "text/plain")
+		c.Status(200)
+
+		data, err := getData(dbmap, 9999)
+		if err != nil {
+			_ = c.Error(err)
+			return
+		}
+
+		lines := []string{"date,weight"}
+
+		for _, d := range data {
+			lines = append(lines, fmt.Sprintf("%s,%f",
+				d.T.Format("2006/01/02 15:04:05"),
+				d.Weight,
+			))
+		}
+
+		content := []byte(strings.Join(lines, "\n"))
+
+		_, _ = c.Writer.Write(content)
 	})
 
 	files(r,
