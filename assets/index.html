@@ -24,6 +24,29 @@
             font-style: italic;
         }
     </style>
+
+    <script type="text/javascript" src="dygraph.min.js"></script>
+    <link rel="stylesheet" type="text/css" src="dygraph.css"/>
+
+    <script type="text/javascript">
+        Dygraph.onDOMready(function onDOMready() {
+            // let data = "Date,Temperature\n" +
+            //     "2008-05-07,75\n" +
+            //     "2008-05-08,70\n" +
+            //     "2008-05-09,80\n";
+
+            let data = "data.csv"
+
+            let g = new Dygraph(
+                // containing div
+                document.getElementById("graphdiv"),
+
+                // CSV or path to a CSV file.
+                data,
+            );
+        });
+    </script>
+
 </head>
 <body>
 <form action="{{.action}}" method="post">
@@ -51,6 +74,8 @@
 <div>
     (<a href="weight.svg?months=9999">view all</a>)
 </div>
+
+<div id="graphdiv" class="wide"></div>
 
 <table>
     <tr>
