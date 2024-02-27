@@ -22,6 +22,8 @@ import (
 const (
 	dbHost   = "127.0.0.1"
 	location = "America/Los_Angeles"
+
+	day = 24 * time.Hour
 )
 
 func run() error {
@@ -180,7 +182,17 @@ func run() error {
 
 		lines := []string{"date,weight"}
 
-		for _, d := range data {
+		for i, d := range data {
+			if i > 0 {
+				d0 := data[i-1]
+				dt := d.T.Sub(d0.T)
+				if dt > 7*day {
+					lines = append(lines, fmt.Sprintf("%s,NaN",
+						d0.T.Format("2006/01/02 15:04:05"),
+					))
+				}
+			}
+
 			lines = append(lines, fmt.Sprintf("%s,%f",
 				d.T.Format("2006/01/02 15:04:05"),
 				d.Weight,
