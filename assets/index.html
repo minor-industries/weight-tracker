@@ -37,12 +37,17 @@
 
             let data = "data.csv"
 
-            let g = new Dygraph(
+            const t1 = new Date();
+            const t0 = new Date(t1);
+            t0.setMonth(t0.getMonth() - 3);
+
+            window.g = new Dygraph(
                 // containing div
                 document.getElementById("graphdiv"),
 
                 // CSV or path to a CSV file.
                 data,
+                {dateWindow: [t0, t1]}
             );
         });
     </script>
