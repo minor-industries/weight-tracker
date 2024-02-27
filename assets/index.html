@@ -23,10 +23,16 @@
             text-align: center;
             font-style: italic;
         }
+
+        #graphdiv {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 10px;
+        }
     </style>
 
     <script type="text/javascript" src="dygraph.min.js"></script>
-    <link rel="stylesheet" type="text/css" src="dygraph.css"/>
+    <link rel="stylesheet" type="text/css" href="dygraph.css"/>
 
     <script type="text/javascript">
         Dygraph.onDOMready(function onDOMready() {
@@ -48,7 +54,11 @@
 
                 // CSV or path to a CSV file.
                 data,
-                {dateWindow: [t0, t1]}
+                {
+                    dateWindow: [t0, t1],
+                    title: "Weight",
+                    ylabel: "Weight (kg)"
+                }
             );
         });
     </script>
@@ -73,9 +83,9 @@
     </div>
 </form>
 
-<div>
-    <img src="weight.svg"/>
-</div>
+<!--<div>-->
+<!--    <img src="weight.svg"/>-->
+<!--</div>-->
 
 <div id="graphdiv" class="wide"></div>
 
