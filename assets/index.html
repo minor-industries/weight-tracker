@@ -40,6 +40,7 @@
             const t1 = new Date();
             const t0 = new Date(t1);
             t0.setMonth(t0.getMonth() - 3);
+            t1.setDate(t0.getDate() + 1); // maybe better to use some padding options here instead
 
             window.g = new Dygraph(
                 // containing div
