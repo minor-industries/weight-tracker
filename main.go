@@ -16,7 +16,6 @@ import (
 	"time"
 	"weight-tracker/assets"
 	"weight-tracker/db"
-	"weight-tracker/graphs"
 )
 
 const (
@@ -24,6 +23,8 @@ const (
 	location = "America/Los_Angeles"
 
 	day = 24 * time.Hour
+
+	defaultStartDate = "2011-01-01"
 )
 
 func run() error {
@@ -103,9 +104,13 @@ func run() error {
 	r.SetHTMLTemplate(templ)
 
 	r.GET("/", func(c *gin.Context) {
-		months := getMonthsParam(c, 3)
+		after, err := time.Parse("2006-01-02", c.DefaultQuery("after", defaultStartDate))
+		if err != nil {
+			c.AbortWithError(400, errors.Wrap(err, "parse time"))
+			return
+		}
 
-		data, err := getData(dbmap, months)
+		data, err := getDataAfter(dbmap, after)
 		if err != nil {
 			_ = c.Error(err)
 			return
@@ -121,22 +126,6 @@ func run() error {
 			"id":     uuid.New().String(),
 			"data":   data,
 		})
-	})
-
-	r.GET("/weight.svg", func(c *gin.Context) {
-		months := getMonthsParam(c, 3)
-
-		data, err := getData(dbmap, months)
-		if err != nil {
-			_ = c.Error(err)
-			return
-		}
-
-		svg, err := graphs.Graph(data)
-		if err != nil {
-			panic(err)
-		}
-		c.Data(200, "image/svg+xml", svg)
 	})
 
 	r.POST("/form-handler", func(c *gin.Context) {
@@ -174,7 +163,13 @@ func run() error {
 		c.Writer.Header().Set("Content-Type", "text/plain")
 		c.Status(200)
 
-		data, err := getData(dbmap, 9999)
+		after, err := time.Parse("2006-01-02", c.DefaultQuery("after", defaultStartDate))
+		if err != nil {
+			c.AbortWithError(400, errors.Wrap(err, "parse time"))
+			return
+		}
+
+		data, err := getDataAfter(dbmap, after)
 		if err != nil {
 			_ = c.Error(err)
 			return
@@ -231,18 +226,6 @@ func files(r *gin.Engine, files ...string) {
 			_, _ = c.Writer.Write(content)
 		})
 	}
-}
-
-func getMonthsParam(c *gin.Context, dflt int) int {
-	months := dflt
-	if m, ok := c.GetQuery("months"); ok {
-		mInt, err := strconv.ParseInt(m, 10, 64)
-		switch err {
-		case nil:
-			months = int(mInt)
-		}
-	}
-	return months
 }
 
 func Exprs(first string, rest ...string) []any {

@@ -25,7 +25,7 @@
         }
 
         #graphdiv {
-            width: 100%;
+            width: 98%;
             height: 400px;
             margin-bottom: 10px;
         }
@@ -41,7 +41,11 @@
             //     "2008-05-08,70\n" +
             //     "2008-05-09,80\n";
 
-            let data = "data.csv"
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const after = urlParams.get('after') || '2023-06-10';
+
+            let data = `data.csv?after=${after}`
 
             const t1 = new Date();
             const t0 = new Date(t1);
@@ -55,7 +59,7 @@
                 // CSV or path to a CSV file.
                 data,
                 {
-                    dateWindow: [t0, t1],
+                    // dateWindow: [t0, t1],
                     title: "Weight",
                     ylabel: "Weight (kg)",
                     strokeWidth: 3.0
@@ -89,6 +93,10 @@
 <!--</div>-->
 
 <div id="graphdiv" class="wide"></div>
+
+<div>
+    (<a href="?after=2011-01-01">view all</a>)
+</div>
 
 <table>
     <tr>
