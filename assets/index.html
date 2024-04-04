@@ -74,17 +74,24 @@
     </script>
 
     <script type="text/javascript">
-        const second = 1000;
-        const minute = 60 * second;
-        const hour = 60 * minute;
-        const day = 24 * hour;
-
         Dygraph.onDOMready(function onDOMready() {
+            const second = 1000;
+            const minute = 60 * second;
+            const hour = 60 * minute;
+            const day = 24 * hour;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const after = urlParams.get('after') || '2023-06-10';
+            const t1 = new Date();
+            const t0 = new Date(after);
+
+            const windowSize = t1.getTime() - t0.getTime();
+
             new Graph(document.getElementById("graphdiv1"), {
                 seriesNames: ["weight"],
                 title: "Weight",
                 height: 400,
-                windowSize: 90 * day,
+                windowSize: windowSize,
                 labels: ["x", "Y1"],
                 maxGapMs: 7.5 * day,
             });
