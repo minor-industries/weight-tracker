@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Weight Tracker</title>
+
     <style>
         table {
             border-collapse: collapse;
@@ -31,8 +32,12 @@
         }
     </style>
 
-    <script type="text/javascript" src="dygraph.min.js"></script>
     <link rel="stylesheet" type="text/css" href="dygraph.css"/>
+    <link rel="stylesheet" type="text/css" href="rtgraph.css"/>
+
+    <script type="text/javascript" src="dygraph.min.js"></script>
+    <script type="text/javascript" src="msgpack.min.js"></script>
+    <script type="text/javascript" src="rtgraph.js"></script>
 
     <script type="text/javascript">
         Dygraph.onDOMready(function onDOMready() {
@@ -68,6 +73,23 @@
         });
     </script>
 
+    <script type="text/javascript">
+        const second = 1000;
+        const minute = 60 * second;
+        const hour = 60 * minute;
+        const day = 24 * hour;
+
+        Dygraph.onDOMready(function onDOMready() {
+            new Graph(document.getElementById("graphdiv1"), {
+                seriesNames: ["weight"],
+                title: "Weight",
+                height: 400,
+                windowSize: 90 * day,
+                labels: ["x", "Y1"],
+                maxGapMs: 7.5 * day,
+            });
+        });
+    </script>
 </head>
 <body>
 <form action="{{.action}}" method="post">
@@ -93,6 +115,7 @@
 <!--</div>-->
 
 <div id="graphdiv" class="wide"></div>
+<div id="graphdiv1" class="wide"></div>
 
 <div>
     (<a href="?after=2011-01-01">view all</a>)

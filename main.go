@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-gorp/gorp/v3"
 	"github.com/google/uuid"
+	"github.com/minor-industries/rtgraph"
+	"github.com/minor-industries/rtgraph/schema"
 	"github.com/pkg/errors"
 	"html/template"
 	"io/fs"
@@ -27,13 +29,54 @@ const (
 	defaultStartDate = "2011-01-01"
 )
 
-func run() error {
-	r := gin.Default()
+type StorageBackend struct {
+	db *gorp.DbMap
+}
 
+func (s *StorageBackend) LoadDataWindow(seriesNames []string, start time.Time) ([]schema.Series, error) {
+	rows, err := getDataAfter(s.db, start)
+	if err != nil {
+		return nil, errors.Wrap(err, "get data after")
+	}
+
+	result := make([]schema.Series, len(rows))
+	for idx, row := range rows {
+		result[idx] = schema.Series{
+			SeriesName: "weight", // TODO
+			Timestamp:  row.T,
+			Value:      row.Weight,
+		}
+	}
+
+	return result, nil
+}
+
+func (s *StorageBackend) CreateSeries(seriesNames []string) error {
+	return nil
+}
+
+func (s *StorageBackend) Insert(objects []any) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func run() error {
 	dbmap, err := db.Get(dbHost)
 	if err != nil {
 		return errors.Wrap(err, "get db")
 	}
+
+	backend := &StorageBackend{
+		db: dbmap,
+	}
+
+	errCh := make(chan error)
+	graph, err := rtgraph.New(backend, errCh, []string{"weight"}, nil)
+	if err != nil {
+		return errors.Wrap(err, "new rtgraph")
+	}
+
+	r := graph.GetEngine()
 
 	funcs := map[string]any{
 		"Localtime": func(w db.Weight) string {
@@ -103,7 +146,7 @@ func run() error {
 	templ := template.Must(template.New("").Funcs(funcs).ParseFS(assets.FS, "*.html"))
 	r.SetHTMLTemplate(templ)
 
-	r.GET("/", func(c *gin.Context) {
+	r.GET("/index.html", func(c *gin.Context) {
 		after, err := time.Parse("2006-01-02", c.DefaultQuery("after", defaultStartDate))
 		if err != nil {
 			c.AbortWithError(400, errors.Wrap(err, "parse time"))
@@ -198,11 +241,6 @@ func run() error {
 
 		_, _ = c.Writer.Write(content)
 	})
-
-	files(r,
-		"dygraph.min.js", "application/javascript",
-		"dygraph.css", "text/css",
-	)
 
 	if err := r.Run("0.0.0.0:8000"); err != nil {
 		return errors.Wrap(err, "run")
