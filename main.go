@@ -33,18 +33,31 @@ type StorageBackend struct {
 	db *gorp.DbMap
 }
 
-func (s *StorageBackend) LoadDataWindow(seriesNames []string, start time.Time) ([]schema.Series, error) {
-	rows, err := getDataAfter(s.db, start)
-	if err != nil {
-		return nil, errors.Wrap(err, "get data after")
+func (s *StorageBackend) LoadDataWindow(
+	seriesNames []string,
+	start time.Time,
+) ([]schema.Series, error) {
+	if len(seriesNames) != 1 {
+		return nil, errors.New("expected only one series")
 	}
 
-	result := make([]schema.Series, len(rows))
-	for idx, row := range rows {
-		result[idx] = schema.Series{
-			SeriesName: "weight", // TODO
-			Timestamp:  row.T,
-			Value:      row.Weight,
+	seriesName := seriesNames[0]
+	var result []schema.Series
+
+	switch seriesName {
+	case "weight":
+		rows, err := getDataAfter(s.db, start)
+		if err != nil {
+			return nil, errors.Wrap(err, "get data after")
+		}
+
+		result = make([]schema.Series, len(rows))
+		for idx, row := range rows {
+			result[idx] = schema.Series{
+				SeriesName: seriesName, // TODO
+				Timestamp:  row.T,
+				Value:      row.Weight,
+			}
 		}
 	}
 
