@@ -95,6 +95,15 @@
                 labels: ["x", "Y1"],
                 maxGapMs: 7.5 * day,
             });
+
+            new Graph(document.getElementById("graphdiv2"), {
+                seriesNames: ["weight_avg"],
+                title: "Weight (Rolling Avg)",
+                height: 400,
+                windowSize: windowSize,
+                labels: ["x", "Y1"],
+                maxGapMs: 7.5 * day,
+            });
         });
     </script>
 </head>
@@ -123,6 +132,7 @@
 
 <div id="graphdiv" class="wide"></div>
 <div id="graphdiv1" class="wide"></div>
+<div id="graphdiv2" class="wide"></div>
 
 <div>
     (<a href="?after=2011-01-01">view all</a>)

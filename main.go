@@ -59,6 +59,61 @@ func (s *StorageBackend) LoadDataWindow(
 				Value:      row.Weight,
 			}
 		}
+	case "weight_avg":
+		return computeAvg(
+			s,
+			"weight",
+			start,
+			(7*24+12)*time.Hour,
+		)
+	default:
+		return nil, errors.New("unknown series")
+	}
+
+	return result, nil
+}
+
+// TODO: below could use some tests
+func computeAvg(
+	s *StorageBackend,
+	originalSeries string,
+	start time.Time,
+	lookback time.Duration,
+) ([]schema.Series, error) {
+	window, err := s.LoadDataWindow([]string{originalSeries}, start.Add(-lookback))
+	if err != nil {
+		return nil, errors.Wrap(err, "load original series")
+	}
+
+	count := 0
+	sum := 0.0
+	var result []schema.Series
+
+	for end, bgn := 0, 0; end < len(window); end++ {
+		endPt := window[end]
+		count++
+		sum += endPt.Value
+		cutoff := endPt.Timestamp.Add(-lookback)
+		for ; bgn < end; bgn++ {
+			bgnPt := window[bgn]
+			if bgnPt.Timestamp.After(cutoff) {
+				break
+			}
+			count--
+			sum -= bgnPt.Value
+		}
+		if endPt.Timestamp.Before(start) {
+			continue
+		}
+		if count == 0 {
+			panic("didn't expect this")
+		}
+		value := sum / float64(count)
+		result = append(result, schema.Series{
+			SeriesName: originalSeries + "_avg",
+			Timestamp:  endPt.Timestamp,
+			Value:      value,
+		})
 	}
 
 	return result, nil
