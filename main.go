@@ -7,6 +7,7 @@ import (
 	"github.com/go-gorp/gorp/v3"
 	"github.com/google/uuid"
 	"github.com/minor-industries/rtgraph"
+	"github.com/minor-industries/rtgraph/computed_request"
 	"github.com/minor-industries/rtgraph/schema"
 	"github.com/pkg/errors"
 	"html/template"
@@ -34,89 +35,34 @@ type StorageBackend struct {
 }
 
 func (s *StorageBackend) LoadDataWindow(
-	seriesNames []string,
+	seriesName string,
 	start time.Time,
-) ([]schema.Series, error) {
-	if len(seriesNames) != 1 {
-		return nil, errors.New("expected only one series")
-	}
-
-	seriesName := seriesNames[0]
-	var result []schema.Series
+) (schema.Series, error) {
+	var values []schema.Value
 
 	switch seriesName {
 	case "weight":
 		rows, err := getDataAfter(s.db, start)
 		if err != nil {
-			return nil, errors.Wrap(err, "get data after")
+			return schema.Series{}, errors.Wrap(err, "get data after")
 		}
 
-		result = make([]schema.Series, len(rows))
+		values = make([]schema.Value, len(rows))
+
 		for idx, row := range rows {
-			result[idx] = schema.Series{
-				SeriesName: seriesName, // TODO
-				Timestamp:  row.T,
-				Value:      row.Weight,
+			values[idx] = schema.Value{
+				Timestamp: row.T,
+				Value:     row.Weight,
 			}
 		}
-	case "weight_avg":
-		return computeAvg(
-			s,
-			"weight",
-			start,
-			(7*24+12)*time.Hour,
-		)
 	default:
-		return nil, errors.New("unknown series")
+		return schema.Series{}, errors.New("unknown series")
 	}
 
-	return result, nil
-}
-
-// TODO: below could use some tests
-func computeAvg(
-	s *StorageBackend,
-	originalSeries string,
-	start time.Time,
-	lookback time.Duration,
-) ([]schema.Series, error) {
-	window, err := s.LoadDataWindow([]string{originalSeries}, start.Add(-lookback))
-	if err != nil {
-		return nil, errors.Wrap(err, "load original series")
-	}
-
-	count := 0
-	sum := 0.0
-	var result []schema.Series
-
-	for end, bgn := 0, 0; end < len(window); end++ {
-		endPt := window[end]
-		count++
-		sum += endPt.Value
-		cutoff := endPt.Timestamp.Add(-lookback)
-		for ; bgn < end; bgn++ {
-			bgnPt := window[bgn]
-			if bgnPt.Timestamp.After(cutoff) {
-				break
-			}
-			count--
-			sum -= bgnPt.Value
-		}
-		if endPt.Timestamp.Before(start) {
-			continue
-		}
-		if count == 0 {
-			panic("didn't expect this")
-		}
-		value := sum / float64(count)
-		result = append(result, schema.Series{
-			SeriesName: originalSeries + "_avg",
-			Timestamp:  endPt.Timestamp,
-			Value:      value,
-		})
-	}
-
-	return result, nil
+	return schema.Series{
+		SeriesName: seriesName,
+		Values:     values,
+	}, nil
 }
 
 func (s *StorageBackend) CreateSeries(seriesNames []string) error {
@@ -139,7 +85,16 @@ func run() error {
 	}
 
 	errCh := make(chan error)
-	graph, err := rtgraph.New(backend, errCh, []string{"weight"}, nil)
+	graph, err := rtgraph.New(
+		backend,
+		errCh,
+		[]string{"weight"},
+		[]computed_request.ComputedReq{{
+			SeriesName: "weight",
+			Function:   "avg",
+			Seconds:    60 * 60 * (24*7 + 12),
+		}},
+	)
 	if err != nil {
 		return errors.Wrap(err, "new rtgraph")
 	}
