@@ -7,7 +7,6 @@ import (
 	"github.com/go-gorp/gorp/v3"
 	"github.com/google/uuid"
 	"github.com/minor-industries/rtgraph"
-	"github.com/minor-industries/rtgraph/computed_request"
 	"github.com/minor-industries/rtgraph/schema"
 	"github.com/pkg/errors"
 	"html/template"
@@ -89,11 +88,6 @@ func run() error {
 		backend,
 		errCh,
 		[]string{"weight"},
-		[]computed_request.ComputedReq{{
-			SeriesName: "weight",
-			Function:   "avg",
-			Seconds:    60 * 60 * (24*7 + 12),
-		}},
 	)
 	if err != nil {
 		return errors.Wrap(err, "new rtgraph")
