@@ -24,12 +24,6 @@
             text-align: center;
             font-style: italic;
         }
-
-        #graphdiv {
-            width: 98%;
-            height: 400px;
-            margin-bottom: 10px;
-        }
     </style>
 
     <link rel="stylesheet" type="text/css" href="dygraph.css"/>
@@ -38,40 +32,6 @@
     <script type="text/javascript" src="dygraph.min.js"></script>
     <script type="text/javascript" src="msgpack.min.js"></script>
     <script type="text/javascript" src="rtgraph.js"></script>
-
-    <script type="text/javascript">
-        Dygraph.onDOMready(function onDOMready() {
-            // let data = "Date,Temperature\n" +
-            //     "2008-05-07,75\n" +
-            //     "2008-05-08,70\n" +
-            //     "2008-05-09,80\n";
-
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const after = urlParams.get('after') || '2023-06-10';
-
-            let data = `data.csv?after=${after}`
-
-            const t1 = new Date();
-            const t0 = new Date(t1);
-            t0.setMonth(t0.getMonth() - 3);
-            t1.setDate(t0.getDate() + 1); // maybe better to use some padding options here instead
-
-            window.g = new Dygraph(
-                // containing div
-                document.getElementById("graphdiv"),
-
-                // CSV or path to a CSV file.
-                data,
-                {
-                    // dateWindow: [t0, t1],
-                    title: "Weight",
-                    ylabel: "Weight (kg)",
-                    strokeWidth: 3.0
-                }
-            );
-        });
-    </script>
 
     <script type="text/javascript">
         Dygraph.onDOMready(function onDOMready() {
@@ -87,23 +47,21 @@
 
             const windowSize = t1.getTime() - t0.getTime();
 
-            new Graph(document.getElementById("graphdiv1"), {
-                seriesNames: ["weight"],
-                title: "Weight",
-                height: 400,
-                windowSize: windowSize,
-                labels: ["x", "Y1"],
-                maxGapMs: 7.5 * day,
-                disableScroll: true
-            });
+            const seriesOpts = {
+                y1: {
+                    strokeWidth: 1.0
+                }
+            }
 
-            new Graph(document.getElementById("graphdiv2"), {
-                seriesNames: ["weight,avg,10800m"],
+            new Graph(document.getElementById("graphdiv1"), {
+                seriesNames: ["weight", "weight,avg,10800m"],
                 title: "Weight (Rolling Avg)",
                 height: 400,
                 windowSize: windowSize,
-                labels: ["x", "Y1"],
+                labels: ["x", "y1", "y2"],
                 maxGapMs: 7.5 * day,
+                series: seriesOpts,
+                ylabel: "Weight (kg)",
                 disableScroll: true
             });
         });
@@ -128,13 +86,7 @@
     </div>
 </form>
 
-<!--<div>-->
-<!--    <img src="weight.svg"/>-->
-<!--</div>-->
-
-<div id="graphdiv" class="wide"></div>
 <div id="graphdiv1" class="wide"></div>
-<div id="graphdiv2" class="wide"></div>
 
 <div>
     (<a href="?after=2011-01-01">view all</a>)
