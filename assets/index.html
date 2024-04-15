@@ -58,7 +58,7 @@
                 }
             }
 
-            new Graph(document.getElementById("graphdiv1"), {
+            const g1 = new Graph(document.getElementById("graphdiv1"), {
                 seriesNames: [
                     "weight",
                     "weight | avg 10800m"
@@ -71,6 +71,31 @@
                 series: seriesOpts,
                 ylabel: "Weight (kg)",
                 disableScroll: true
+            });
+
+            const ranges = {
+                "20yr": 20 * 365 * day, // close enough
+                "10yr": 10 * 365 * day,
+                "5yr": 5 * 365 * day,
+                "2yr": 2 * 365 * day,
+                "1yr": 365 * day,
+                "6mo": 6 * 30 * day,
+                "3mo": 3 * 30 * day,
+                "1mo": 30 * day,
+                "2wk": 14 * day,
+                "1wk": 7 * day,
+            }
+
+            const buttons = document.querySelectorAll('#range-selector button')
+            buttons.forEach(button => {
+                button.onclick = e => {
+                    const t1 = new Date();
+                    const range = ranges[button.textContent];
+                    const t0 = new Date(t1.getTime() - range);
+                    g1.g.updateOptions({
+                        dateWindow: [t0, t1]
+                    })
+                }
             });
         });
     </script>
@@ -102,6 +127,20 @@
     <!-- Graph Section -->
     <div class="pure-u-1" style="margin-top: 20px;">
         <div id="graphdiv1" style="width: 100%;"></div>
+    </div>
+
+    <!-- Range Selector -->
+    <div id="range-selector" class="pure-button-group" role="group" style="margin-top: 10px;">
+        <button class="pure-button">20yr</button>
+        <button class="pure-button">10yr</button>
+        <button class="pure-button">5yr</button>
+        <button class="pure-button">2yr</button>
+        <button class="pure-button">1yr</button>
+        <button class="pure-button">6mo</button>
+        <button class="pure-button">3mo</button>
+        <button class="pure-button">1mo</button>
+        <button class="pure-button">2wk</button>
+        <button class="pure-button">1wk</button>
     </div>
 
     <!-- View All Link -->
