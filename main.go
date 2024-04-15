@@ -93,6 +93,11 @@ func run() error {
 		return errors.Wrap(err, "new rtgraph")
 	}
 
+	graph.StaticFiles(assets.FS,
+		"purecss/base-min.css", "text/css",
+		"purecss/pure-min.css", "text/css",
+	)
+
 	r := graph.GetEngine()
 
 	funcs := map[string]any{

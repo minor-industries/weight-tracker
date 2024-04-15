@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Weight Tracker</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <style>
         table {
             border-collapse: collapse;
@@ -25,6 +27,9 @@
             font-style: italic;
         }
     </style>
+
+    <link rel="stylesheet" type="text/css" href="purecss/base-min.css"/>
+    <link rel="stylesheet" type="text/css" href="purecss/pure-min.css"/>
 
     <link rel="stylesheet" type="text/css" href="dygraph.css"/>
     <link rel="stylesheet" type="text/css" href="rtgraph.css"/>
@@ -67,59 +72,70 @@
         });
     </script>
 </head>
+
 <body>
-<form action="{{.action}}" method="post">
-    <div>
-        <input type="hidden" name="id" value="{{.id}}"/>
-        <label>
-            weight
-            <input name="weight"/>
-        </label>
+<div class="pure-g" style="padding: 20px;">
+    <!-- Form Section -->
+    <div class="pure-u-1">
+        <form class="pure-form pure-form-stacked" action="{{.action}}" method="post">
+            <fieldset>
+                <input type="hidden" name="id" value="{{.id}}"/>
+                <div class="pure-control-group">
+                    <label>
+                        Weight:
+                        <input type="text" name="weight" placeholder="Enter your weight">
+                    </label>
+                </div>
+                <label class="pure-radio">
+                    <input type="radio" name="unit" value="kg" checked> kg
+                </label>
+                <label class="pure-radio">
+                    <input type="radio" name="unit" value="lbs"> lbs
+                </label>
+            </fieldset>
+        </form>
     </div>
 
-    <div>
-        <input type="radio" id="kg" name="unit" value="kg" checked="checked">
-        <label for="kg">kg</label><br>
-
-        <input type="radio" id="lbs" name="unit" value="lbs">
-        <label for="lbs">lbs</label><br>
+    <!-- Graph Section -->
+    <div class="pure-u-1" style="margin-top: 20px;">
+        <div id="graphdiv1" style="width: 100%;"></div>
     </div>
-</form>
 
-<div id="graphdiv1" class="wide"></div>
+    <!-- View All Link -->
+    <div class="pure-u-1" style="margin-top: 20px;">
+        (<a href="?after=2011-01-01">view all</a>)
+    </div>
 
-<div>
-    (<a href="?after=2011-01-01">view all</a>)
+    <!-- Data Table -->
+    <table class="pure-table pure-table-horizontal" style="margin-top: 20px;">
+        <thead>
+        <tr>
+            <th>Time</th>
+            <th>Day</th>
+            <th>Weight</th>
+            <th>Delta</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{$data := .data}}
+        {{range $i, $d := .data}}
+        <tr>
+            <td>{{Localtime $d}}</td>
+            <td>{{DateOfWeek $d}}</td>
+            <td>{{FmtWeight $d.Weight}}</td>
+            <td>{{Delta $data $i}}</td>
+        </tr>
+        {{$missing := DaysMissing $data $i}}
+        {{if $missing}}
+        <tr>
+            <td class="center" colspan="4">{{$missing}}</td>
+        </tr>
+        {{end}}
+        {{end}}
+        </tbody>
+    </table>
+
 </div>
-
-<table>
-    <tr>
-        <th>Time</th>
-        <th>Day</th>
-        <th>Weight</th>
-        <th>Delta</th>
-
-    </tr>
-    {{$data := .data}}
-    {{range $i, $d := .data}}
-    <tr>
-        <td>{{Localtime $d}}</td>
-        <td>{{DateOfWeek $d}}</td>
-        <td>{{FmtWeight $d.Weight}}</td>
-        <td>{{Delta $data $i}}</td>
-    </tr>
-    {{$missing := DaysMissing $data $i}}
-    {{if $missing}}
-    <tr>
-        <td class="center" colspan="4">{{$missing}}</td>
-    </tr>
-    {{end}}
-    {{end}}
-</table>
-
-
-<hr>
-{{.date}}
 
 </body>
 </html>
