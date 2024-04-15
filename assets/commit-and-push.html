@@ -3,16 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <title>Commit and Push</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="purecss/base-min.css"/>
+    <link rel="stylesheet" type="text/css" href="purecss/pure-min.css"/>
 </head>
 <body>
-<div>
-    Commit: {{.commit}}
-</div>
-<div>
-    Error: {{.err}}
-</div>
-<div>
-    <a href="/">back home</a>
+<div class="pure-g" style="padding: 20px;">
+    <div class="pure-u-1">
+        <table class="pure-table pure-table-horizontal">
+            <thead>
+            <tr>
+                <th>Detail</th>
+                <th>Information</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Commit</td>
+                <td>{{.commit}}</td>
+            </tr>
+            <tr>
+                <td>Error</td>
+                <td>{{.err}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <div style="margin-top: 20px;">
+            <a href="/" class="pure-button pure-button-primary">Back Home</a>
+        </div>
+    </div>
 </div>
 </body>
 </html>
