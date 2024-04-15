@@ -3,16 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Weight Submitted</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="purecss/base-min.css"/>
+    <link rel="stylesheet" type="text/css" href="purecss/pure-min.css"/>
 </head>
 <body>
-<div>
-    Submitted {{.weight}} {{.unit}} at {{.t}}
-</div>
-<div>
-    Id: {{.id}}
-</div>
-<div>
-    <a href="commit-and-push.html">commit and push</a>
+<div class="pure-g container" style="padding: 20px;">
+    <div class="pure-u-1">
+        <table class="pure-table pure-table-horizontal">
+            <thead>
+            <tr>
+                <th>Submission Detail</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Weight</td>
+                <td>{{.weight}} {{.unit}}</td>
+            </tr>
+            <tr>
+                <td>Time</td>
+                <td>{{.t}}</td>
+            </tr>
+            <tr>
+                <td>ID</td>
+                <td>{{.id}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="pure-u-1">
+        <div style="margin-top: 20px;">
+            <a href="commit-and-push.html" class="pure-button pure-button-primary">Commit and Push</a>
+        </div>
+    </div>
 </div>
 </body>
 </html>
