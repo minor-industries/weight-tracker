@@ -87,6 +87,7 @@ func run() error {
 	graph, err := rtgraph.New(
 		backend,
 		errCh,
+		rtgraph.Opts{},
 		[]string{"weight"},
 	)
 	if err != nil {
