@@ -6,37 +6,24 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <link rel="stylesheet" type="text/css" href="rtgraph/dygraph.css"/>
+    <link rel="stylesheet" type="text/css" href="rtgraph/rtgraph.css"/>
+
+    <link rel="stylesheet" type="text/css" href="rtgraph/purecss/base-min.css">
+    <link rel="stylesheet" type="text/css" href="rtgraph/purecss/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="rtgraph/purecss/grids-responsive-min.css">
+
+    <script type="text/javascript" src="rtgraph/dygraph.min.js"></script>
+    <script type="text/javascript" src="rtgraph/msgpack.min.js"></script>
+    <script type="text/javascript" src="rtgraph/rtgraph.js"></script>
+
     <style>
-        table {
-            border-collapse: collapse;
-            border: 2px solid #ccc;
-        }
-
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
         .center {
             text-align: center;
             font-style: italic;
         }
     </style>
 
-    <link rel="stylesheet" type="text/css" href="purecss/base-min.css"/>
-    <link rel="stylesheet" type="text/css" href="purecss/pure-min.css"/>
-
-    <link rel="stylesheet" type="text/css" href="dygraph.css"/>
-    <link rel="stylesheet" type="text/css" href="rtgraph.css"/>
-
-    <script type="text/javascript" src="dygraph.min.js"></script>
-    <script type="text/javascript" src="msgpack.min.js"></script>
-    <script type="text/javascript" src="rtgraph.js"></script>
 
     <script type="text/javascript">
         Dygraph.onDOMready(function onDOMready() {
@@ -102,7 +89,7 @@
 </head>
 
 <body>
-<div class="pure-g" style="padding: 20px;">
+<div class="pure-g" style="padding: 10px;">
     <!-- Form Section -->
     <div class="pure-u-1">
         <form class="pure-form pure-form-stacked" action="{{.action}}" method="post">
@@ -125,8 +112,8 @@
     </div>
 
     <!-- Graph Section -->
-    <div class="pure-u-1" style="margin-top: 20px;">
-        <div id="graphdiv1" style="width: 100%;"></div>
+    <div class="pure-u-1">
+        <div id="graphdiv1" class="rtgraph-graph"></div>
     </div>
 
     <!-- Range Selector -->

@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-gorp/gorp/v3"
 	"github.com/google/uuid"
+	flags "github.com/jessevdk/go-flags"
 	"github.com/minor-industries/rtgraph"
 	"github.com/minor-industries/rtgraph/schema"
 	"github.com/pkg/errors"
@@ -28,6 +29,10 @@ const (
 
 	defaultStartDate = "2011-01-01"
 )
+
+var opts struct {
+	Port int `long:"port" default:"8000" env:"PORT"`
+}
 
 type StorageBackend struct {
 	db *gorp.DbMap
@@ -74,6 +79,11 @@ func (s *StorageBackend) Insert(objects []any) error {
 }
 
 func run() error {
+	_, err := flags.Parse(&opts)
+	if err != nil {
+		return errors.Wrap(err, "parse flags")
+	}
+
 	dbmap, err := db.Get(dbHost)
 	if err != nil {
 		return errors.Wrap(err, "get db")
