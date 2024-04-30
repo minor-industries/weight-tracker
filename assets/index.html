@@ -15,7 +15,6 @@
 
     <script type="text/javascript" src="rtgraph/dygraph.min.js"></script>
     <script type="text/javascript" src="rtgraph/msgpack.min.js"></script>
-    <script type="text/javascript" src="rtgraph/rtgraph.js"></script>
 
     <style>
         .center {
@@ -25,8 +24,10 @@
     </style>
 
 
-    <script type="text/javascript">
-        Dygraph.onDOMready(function onDOMready() {
+    <script type="module">
+        import {Graph} from './rtgraph/dist/rtgraph.js';
+
+        document.addEventListener("DOMContentLoaded", () => {
             const second = 1000;
             const minute = 60 * second;
             const hour = 60 * minute;

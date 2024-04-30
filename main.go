@@ -73,7 +73,7 @@ func (s *StorageBackend) CreateSeries(seriesNames []string) error {
 	return nil
 }
 
-func (s *StorageBackend) Insert(objects []any) error {
+func (s *StorageBackend) InsertValue(seriesName string, timestamp time.Time, value float64) error {
 	//TODO implement me
 	panic("implement me")
 }
