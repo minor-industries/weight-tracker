@@ -9,7 +9,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/uuid v1.6.0
 	github.com/jessevdk/go-flags v1.5.0
-	github.com/minor-industries/rtgraph v0.0.9
+	github.com/minor-industries/rtgraph v0.0.12-0.20240430180047-35f9e76bb6af
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
 	gonum.org/v1/plot v0.13.0

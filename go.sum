@@ -103,6 +103,12 @@ github.com/minor-industries/rtgraph v0.0.8 h1:4VBEbKpIlNdRAnI4Md6dqFUaGeQjXYz9T4
 github.com/minor-industries/rtgraph v0.0.8/go.mod h1:Q4ppCS0abSAOuqws+d+fh07ZDo6drahUO+RPM/3rwlY=
 github.com/minor-industries/rtgraph v0.0.9 h1:oeFAtKI8huPVfIuCOQhRbXK1saBeS5vz4NljUlLGCgU=
 github.com/minor-industries/rtgraph v0.0.9/go.mod h1:Q4ppCS0abSAOuqws+d+fh07ZDo6drahUO+RPM/3rwlY=
+github.com/minor-industries/rtgraph v0.0.12-0.20240430142748-1b779554a1cf h1:wbvHgHhqoZ0joMeh9A5Wc+uIC4wlkl0yaxVjeslK7Sk=
+github.com/minor-industries/rtgraph v0.0.12-0.20240430142748-1b779554a1cf/go.mod h1:Q4ppCS0abSAOuqws+d+fh07ZDo6drahUO+RPM/3rwlY=
+github.com/minor-industries/rtgraph v0.0.12-0.20240430173458-a65757df6377 h1:1XiX/bXG8BHxoTfCZILBsVfHo4XmHY3zC1q/aR83PrA=
+github.com/minor-industries/rtgraph v0.0.12-0.20240430173458-a65757df6377/go.mod h1:Q4ppCS0abSAOuqws+d+fh07ZDo6drahUO+RPM/3rwlY=
+github.com/minor-industries/rtgraph v0.0.12-0.20240430180047-35f9e76bb6af h1:y5NBmhC9mHYDFod3EU31n2yWoJ+qHg5U2ZWJutaFuqk=
+github.com/minor-industries/rtgraph v0.0.12-0.20240430180047-35f9e76bb6af/go.mod h1:Q4ppCS0abSAOuqws+d+fh07ZDo6drahUO+RPM/3rwlY=
 github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd h1:TRLaZ9cD/w8PVh93nsPXa1VrQ6jlwL5oN8l14QlcNfg=
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=

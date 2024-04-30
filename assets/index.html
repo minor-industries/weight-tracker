@@ -25,7 +25,7 @@
 
 
     <script type="module">
-        import {Graph} from './rtgraph/dist/rtgraph.js';
+        import {Graph} from './rtgraph/rtgraph.js';
 
         document.addEventListener("DOMContentLoaded", () => {
             const second = 1000;
@@ -54,7 +54,6 @@
                 title: "Weight (Rolling Avg)",
                 height: 400,
                 windowSize: windowSize,
-                labels: ["x", "y1", "y2"],
                 maxGapMs: 7.5 * day,
                 series: seriesOpts,
                 ylabel: "Weight (kg)",
@@ -80,9 +79,7 @@
                     const t1 = new Date();
                     const range = ranges[button.textContent];
                     const t0 = new Date(t1.getTime() - range);
-                    g1.g.updateOptions({
-                        dateWindow: [t0, t1]
-                    })
+                    g1.setDateWindow([t0, t1]);
                 }
             });
         });
