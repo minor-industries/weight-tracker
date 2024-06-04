@@ -109,6 +109,10 @@ func run() error {
 		"purecss/pure-min.css", "text/css",
 	)
 
+	graph.GetEngine().GET("/ios-icon.png", func(c *gin.Context) {
+		c.FileFromFS("/ios-icon.png", http.FS(assets.FS))
+	})
+
 	r := graph.GetEngine()
 
 	funcs := map[string]any{
