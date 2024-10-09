@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-gorp/gorp/v3"
 	"github.com/google/uuid"
-	flags "github.com/jessevdk/go-flags"
+	"github.com/jessevdk/go-flags"
 	"github.com/minor-industries/rtgraph"
 	"github.com/minor-industries/rtgraph/schema"
 	"github.com/pkg/errors"
@@ -31,7 +31,10 @@ const (
 )
 
 var opts struct {
-	Port int `long:"port" default:"8000" env:"PORT"`
+	Listen     string `long:"listen" default:"0.0.0.0:8000" env:"LISTEN"`
+	DisableTLS bool   `long:"disable-tls" env:"DISABLE_TLS"`
+	TLSCert    string `long:"tls-cert" env:"TLS_CERT" default:"/var/lib/tls/certs/server.pem"`
+	TLSKey     string `long:"tls-key" env:"TLS_KEY" default:"/var/lib/tls/private/server-key.pem"`
 }
 
 type StorageBackend struct {
@@ -279,8 +282,14 @@ func run() error {
 		_, _ = c.Writer.Write(content)
 	})
 
-	if err := r.Run("0.0.0.0:8000"); err != nil {
-		return errors.Wrap(err, "run")
+	if opts.DisableTLS {
+		if err := r.Run(opts.Listen); err != nil {
+			return errors.Wrap(err, "run")
+		}
+	} else {
+		if err := r.RunTLS(opts.Listen, opts.TLSCert, opts.TLSKey); err != nil {
+			return errors.Wrap(err, "run")
+		}
 	}
 
 	return nil
