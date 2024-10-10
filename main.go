@@ -115,18 +115,6 @@ func run() error {
 		return errors.Wrap(err, "new rtgraph")
 	}
 
-	router := gin.New()
-
-	router.GET("/favicon.ico", func(c *gin.Context) {
-		c.Status(204)
-	})
-
-	graph.SetupServer(router.Group("/rtgraph"))
-
-	router.GET("/ios-icon.png", func(c *gin.Context) {
-		c.FileFromFS("/ios-icon.png", http.FS(assets.FS))
-	})
-
 	funcs := map[string]any{
 		"Localtime": func(w db.Weight) string {
 			loc, err := time.LoadLocation(w.Location)
@@ -192,8 +180,21 @@ func run() error {
 		},
 	}
 
+	gin.SetMode(gin.ReleaseMode)
+	router := gin.New()
+
 	templ := template.Must(template.New("").Funcs(funcs).ParseFS(assets.FS, "*.html"))
 	router.SetHTMLTemplate(templ)
+
+	router.GET("/favicon.ico", func(c *gin.Context) {
+		c.Status(204)
+	})
+
+	graph.SetupServer(router.Group("/rtgraph"))
+
+	router.GET("/ios-icon.png", func(c *gin.Context) {
+		c.FileFromFS("/ios-icon.png", http.FS(assets.FS))
+	})
 
 	router.GET("/", func(c *gin.Context) {
 		after, err := time.Parse("2006-01-02", c.DefaultQuery("after", defaultStartDate))
