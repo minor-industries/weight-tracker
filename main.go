@@ -41,7 +41,17 @@ type StorageBackend struct {
 	db *gorp.DbMap
 }
 
-func (s *StorageBackend) LoadDataWindow(
+func (s *StorageBackend) LoadDataBetween(seriesName string, start time.Time, end time.Time) (schema.Series, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *StorageBackend) AllSeriesNames() ([]string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *StorageBackend) LoadDataAfter(
 	seriesName string,
 	start time.Time,
 ) (schema.Series, error) {
@@ -97,26 +107,21 @@ func run() error {
 	}
 
 	errCh := make(chan error)
-	graph, err := rtgraph.New(
+	_, err = rtgraph.New(
 		backend,
 		errCh,
 		rtgraph.Opts{},
-		[]string{"weight"},
+		nil,
 	)
 	if err != nil {
 		return errors.Wrap(err, "new rtgraph")
 	}
 
-	graph.StaticFiles(assets.FS,
-		"purecss/base-min.css", "text/css",
-		"purecss/pure-min.css", "text/css",
-	)
+	router := gin.New()
 
-	graph.GetEngine().GET("/ios-icon.png", func(c *gin.Context) {
+	router.GET("/ios-icon.png", func(c *gin.Context) {
 		c.FileFromFS("/ios-icon.png", http.FS(assets.FS))
 	})
-
-	r := graph.GetEngine()
 
 	funcs := map[string]any{
 		"Localtime": func(w db.Weight) string {
@@ -184,9 +189,9 @@ func run() error {
 	}
 
 	templ := template.Must(template.New("").Funcs(funcs).ParseFS(assets.FS, "*.html"))
-	r.SetHTMLTemplate(templ)
+	router.SetHTMLTemplate(templ)
 
-	r.GET("/index.html", func(c *gin.Context) {
+	router.GET("/index.html", func(c *gin.Context) {
 		after, err := time.Parse("2006-01-02", c.DefaultQuery("after", defaultStartDate))
 		if err != nil {
 			c.AbortWithError(400, errors.Wrap(err, "parse time"))
@@ -211,7 +216,7 @@ func run() error {
 		})
 	})
 
-	r.POST("/form-handler", func(c *gin.Context) {
+	router.POST("/form-handler", func(c *gin.Context) {
 		res, err := writeWeightToDB(
 			dbmap,
 			c.PostForm("weight"),
@@ -228,7 +233,7 @@ func run() error {
 		c.HTML(http.StatusOK, "form-handler.html", res)
 	})
 
-	r.GET("/commit-and-push.html", func(c *gin.Context) {
+	router.GET("/commit-and-push.html", func(c *gin.Context) {
 		commit, err := db.CommitAndPush(dbmap)
 
 		args := map[string]any{
@@ -242,7 +247,7 @@ func run() error {
 		c.HTML(200, "commit-and-push.html", args)
 	})
 
-	r.GET("/data.csv", func(c *gin.Context) {
+	router.GET("/data.csv", func(c *gin.Context) {
 		c.Writer.Header().Set("Content-Type", "text/plain")
 		c.Status(200)
 
@@ -283,11 +288,11 @@ func run() error {
 	})
 
 	if opts.DisableTLS {
-		if err := r.Run(opts.Listen); err != nil {
+		if err := router.Run(opts.Listen); err != nil {
 			return errors.Wrap(err, "run")
 		}
 	} else {
-		if err := r.RunTLS(opts.Listen, opts.TLSCert, opts.TLSKey); err != nil {
+		if err := router.RunTLS(opts.Listen, opts.TLSCert, opts.TLSKey); err != nil {
 			return errors.Wrap(err, "run")
 		}
 	}
