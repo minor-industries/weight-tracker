@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
 	"github.com/go-gorp/gorp/v3"
 	"github.com/google/uuid"
@@ -11,7 +10,6 @@ import (
 	"github.com/minor-industries/rtgraph/schema"
 	"github.com/pkg/errors"
 	"html/template"
-	"io/fs"
 	"net/http"
 	"sort"
 	"strconv"
@@ -197,7 +195,7 @@ func run() error {
 	templ := template.Must(template.New("").Funcs(funcs).ParseFS(assets.FS, "*.html"))
 	router.SetHTMLTemplate(templ)
 
-	router.GET("/index.html", func(c *gin.Context) {
+	router.GET("/", func(c *gin.Context) {
 		after, err := time.Parse("2006-01-02", c.DefaultQuery("after", defaultStartDate))
 		if err != nil {
 			c.AbortWithError(400, errors.Wrap(err, "parse time"))
@@ -304,33 +302,6 @@ func run() error {
 	}
 
 	return nil
-}
-
-func files(r *gin.Engine, files ...string) {
-	for i := 0; i < len(files); i += 2 {
-		name := files[i]
-		ct := files[i+1]
-		r.GET("/"+name, func(c *gin.Context) {
-			header := c.Writer.Header()
-			header["Content-Type"] = []string{ct}
-			content, err := fs.ReadFile(assets.FS, name)
-			if err != nil {
-				c.Status(404)
-				return
-			}
-			_, _ = c.Writer.Write(content)
-		})
-	}
-}
-
-func Exprs(first string, rest ...string) []any {
-	result := []any{
-		squirrel.Expr(first),
-	}
-	for _, i := range rest {
-		result = append(result, squirrel.Expr(i))
-	}
-	return result
 }
 
 func writeWeightToDB(
