@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/jessevdk/go-flags"
 	"github.com/minor-industries/rtgraph"
-	assets2 "github.com/minor-industries/rtgraph/assets"
 	"github.com/minor-industries/rtgraph/schema"
 	"github.com/pkg/errors"
 	"html/template"
@@ -108,7 +107,7 @@ func run() error {
 	}
 
 	errCh := make(chan error)
-	_, err = rtgraph.New(
+	graph, err := rtgraph.New(
 		backend,
 		errCh,
 		rtgraph.Opts{},
@@ -120,8 +119,11 @@ func run() error {
 
 	router := gin.New()
 
-	embeddedFiles, _ := fs.Sub(assets2.FS, "rtgraph")
-	router.StaticFS("/rtgraph", http.FS(embeddedFiles))
+	router.GET("/favicon.ico", func(c *gin.Context) {
+		c.Status(204)
+	})
+
+	graph.SetupServer(router.Group("/rtgraph"))
 
 	router.GET("/ios-icon.png", func(c *gin.Context) {
 		c.FileFromFS("/ios-icon.png", http.FS(assets.FS))
