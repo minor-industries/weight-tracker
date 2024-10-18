@@ -8,7 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/uuid v1.6.0
 	github.com/jessevdk/go-flags v1.5.0
-	github.com/minor-industries/rtgraph v0.0.21
+	github.com/minor-industries/rtgraph v0.0.22
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
 	gonum.org/v1/plot v0.13.0
@@ -22,7 +22,7 @@ require (
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
 	github.com/gammazero/deque v0.2.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-fonts/liberation v0.3.1 // indirect

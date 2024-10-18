@@ -109,7 +109,6 @@ func run() error {
 		backend,
 		errCh,
 		rtgraph.Opts{},
-		nil,
 	)
 	if err != nil {
 		return errors.Wrap(err, "new rtgraph")
